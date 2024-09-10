@@ -1,21 +1,11 @@
-import { useState } from 'react';
-
 interface NavbarProps {
   setQuery: (query: string) => void;
+  query: string;
 }
 
-export default function Navbar({ setQuery }: NavbarProps) {
-  const [input, setInput] = useState('');
-
+export default function Navbar({ setQuery, query }: NavbarProps) {
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(e.target.value);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      setQuery(input);
-      setInput('');
-    }
+    setQuery(e.target.value);
   }
 
   return (
@@ -24,14 +14,7 @@ export default function Navbar({ setQuery }: NavbarProps) {
         <span role='img'>🍿</span>
         <h1>usePopcorn</h1>
       </div>
-      <input
-        className='search'
-        type='text'
-        placeholder='Search movies...'
-        onChange={handleOnChange}
-        value={input}
-        onKeyDown={handleKeyDown}
-      />
+      <input className='search' type='text' placeholder='Search movies...' onChange={handleOnChange} value={query} />
       <p className='num-results'>
         Found <strong>x</strong> results
       </p>
