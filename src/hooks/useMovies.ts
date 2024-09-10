@@ -40,7 +40,7 @@ export default function useMovies(query: string) {
       }
 
       if (query.length < 3) {
-        setError('');
+        setError('No Movies yet');
         setMovies([]);
         return;
       }
