@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const KEY = '36c52d5d';
 
@@ -12,24 +11,44 @@ interface Movie {
   Poster: string;
 }
 
-const fetchMovies = async (query: string): Promise<Movie[]> => {
-  const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=batman`);
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch Movies');
-  }
-
-  const data = await res.json();
-
-  return data.Search;
-};
-
 export default function useMovies(query: string) {
-  const { data, error, isPending } = useQuery({
-    queryKey: ['movies'],
-    queryFn: () => fetchMovies(query),
-    staleTime: 0,
-  });
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  return { data, error, isPending };
+  useEffect(() => {
+    async function fetchMovies() {
+      const controller = new AbortController();
+      try {
+        setIsLoading(true);
+        setError('');
+        const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`, { signal: controller.signal });
+
+        if (!res.ok) throw new Error('Movies not fetched');
+
+        const data = await res.json();
+
+        setMovies(data.Search);
+      } catch (err) {
+        if (err instanceof Error) {
+          if (err.name !== 'AbortError') {
+            setError(err.message);
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+
+      if (query.length < 3) {
+        setError('');
+        setMovies([]);
+        return;
+      }
+
+      return () => controller.abort();
+    }
+    fetchMovies();
+  }, [query]);
+
+  return { movies, error, isLoading };
 }
