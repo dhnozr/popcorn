@@ -10,13 +10,14 @@ interface MovieList {
 
 interface MovieListProps {
   movies: MovieList[];
+  onSelectMovie: (id: string) => void;
 }
 
-export default function MovieList({ movies }: MovieListProps) {
+export default function MovieList({ movies, onSelectMovie }: MovieListProps) {
   return (
     <ul className='list list-movies'>
       {movies?.map(movie => (
-        <Movie movie={movie} key={movie.imdbID} />
+        <Movie movie={movie} key={movie.imdbID} onSelectMovie={onSelectMovie} />
       ))}
     </ul>
   );
