@@ -16,10 +16,11 @@ export interface MovieList {
   imdbID: string;
   Poster: string | undefined;
   Plot?: string | undefined;
-  Runtime?: string | number; // Runtime API'den string olarak gelebilir
-  Released?: number | undefined; // Released string ya da number olabilir, tipini güncelledik
+  Runtime?: string | number;
+  Released?: number | undefined;
   Genre?: string | undefined;
-  imdbRating?: string | number; // imdbRating hem string hem de number olabilir
+  imdbRating?: string | number;
+  userRating?: number;
   Actors?: string | undefined;
   Director?: string | undefined;
 }
@@ -38,9 +39,17 @@ export default function App() {
     setWatched(watched => [...watched, newMovie]);
   }
 
+  function handleDeleteWatched(id: string) {
+    setWatched(watched => watched.filter(movie => movie.imdbID !== id));
+  }
+
+  function handleCloseMovie() {
+    setSelectedId(null);
+  }
+
   return (
     <>
-      <Navbar query={query} setQuery={setQuery} />
+      <Navbar query={query} setQuery={setQuery} movies={movies} />
       <Main>
         <Box>
           {isLoading && <Loader />}
@@ -50,11 +59,16 @@ export default function App() {
 
         <Box>
           {selectedId ? (
-            <MovieDetails onAddWatch={handleAddWatchMovie} selectedId={selectedId} watched={watched} />
+            <MovieDetails
+              onAddWatch={handleAddWatchMovie}
+              selectedId={selectedId}
+              watched={watched}
+              onCloseMovie={handleCloseMovie}
+            />
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList watched={watched} onDeleteWatched={handleDeleteWatched} />
             </>
           )}
         </Box>
