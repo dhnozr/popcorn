@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import Loader from './Loader';
 import { MovieList } from '../App';
+import StarRating from './StarRating';
 const KEY = '36c52d5d';
 
 interface MovieDetailsProps {
   onAddWatch: (movie: MovieList) => void;
   selectedId: string;
   watched: MovieList[];
+  onCloseMovie: () => void;
 }
-export default function MovieDetails({ onAddWatch, selectedId, watched }: MovieDetailsProps) {
+
+export default function MovieDetails({ onAddWatch, selectedId, watched, onCloseMovie }: MovieDetailsProps) {
   const [movie, setMovie] = useState<MovieList | null>();
   const [isLoading, setIsLoading] = useState(false);
-  const [userRating, setUserRating] = useState(2);
+  const [userRating, setUserRating] = useState(0);
   console.log(movie);
 
   const isWatched = watched?.some(movie => movie.imdbID === selectedId);
@@ -39,6 +42,7 @@ export default function MovieDetails({ onAddWatch, selectedId, watched }: MovieD
       Year,
       Poster,
       Plot,
+      userRating,
       Runtime: typeof Runtime === 'string' ? Number(Runtime.split(' ')[0]) : Runtime,
       Released,
       imdbRating: Number(imdbRating),
@@ -57,7 +61,9 @@ export default function MovieDetails({ onAddWatch, selectedId, watched }: MovieD
       ) : (
         <>
           <header>
-            <button className='btn-back'>&larr;</button>
+            <button className='btn-back' onClick={onCloseMovie}>
+              &larr;
+            </button>
             <img src={movie?.Poster} alt={`Poster of ${movie} movie`} />
             <div className='details-overview'>
               <h2>{movie?.Title}</h2>
@@ -76,6 +82,7 @@ export default function MovieDetails({ onAddWatch, selectedId, watched }: MovieD
             <div className='rating'>
               {!isWatched ? (
                 <>
+                  <StarRating onSetRating={setUserRating} maxRating={10} />
                   {userRating > 0 && (
                     <button className='btn-add' onClick={handleAdd}>
                       + Add to list
